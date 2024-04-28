@@ -53,8 +53,37 @@ def activate_env(name : str, venv_depot: str, *, environment: EnvConfig):
     
     # Set the virtual env and path in the environment
     environment.env["VIRTUAL_ENV"] = str(venv_path)
-    environment.env["PATH"] = str(venv_path / "bin") + ":" + environment.env.get("PATH", "")
+
+    # if path is not set, this is probably for a generic activate so we leave a $PATH
+    environment.env["PATH"] = str(venv_path / "bin") + ":" + environment.env.get("PATH", "$PATH")
     return environment
+
+def deactivate_env(venv_depot: str):
+    venv_depot = resolve_env_vars(venv_depot)
+
+    deactivate_lines = []
+    
+    # disable virtual env
+    deactivate_lines.append("unset VIRTUAL_ENV")
+
+    ##################
+    # remove from path
+    # Split the path by the path separator
+    path_parts = os.environ['PATH'].split(os.path.sep)
+    
+    # Find the index of the first occurrence of path_to_eliminate
+    removed_path = False
+    for path in path_parts:
+        if path.startswith(str(venv_depot)):
+            path_parts.remove(path)
+            removed_path = True
+            break
+    
+    if removed_path:
+        new_path = os.pathsep.join(path_parts)
+        deactivate_lines.append(f"export PATH={new_path}")
+
+    return deactivate_lines
 
 def remove_env(name, venv_depot):
     venv_depot = resolve_env_vars(venv_depot)

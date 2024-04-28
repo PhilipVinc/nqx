@@ -3,6 +3,7 @@ from .setup import (
     install,
     create_env,
     activate_env,
+    deactivate_env,
     get_env_type,
     list_envs,
     install_packages,

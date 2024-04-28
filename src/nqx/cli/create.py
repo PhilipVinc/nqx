@@ -63,7 +63,9 @@ def create(
             name, type, venv_depot=venv_depot, force=force, environment=env_config
         )
     else:
-        env_config = provider.activate_env(name, venv_depot=venv_depot, environment=env_config)
+        env_config = provider.activate_env(
+            name, venv_depot=venv_depot, environment=env_config
+        )
 
     ###############################################################
     # Write the nqx tag file to store the env type
@@ -88,7 +90,9 @@ def create(
 
     # install packages using pip
     print("installing packages")
-    provider.install_packages(name, file=requirements_file, venv_depot=venv_depot, environment=env_config)
+    provider.install_packages(
+        name, file=requirements_file, venv_depot=venv_depot, environment=env_config
+    )
     print("installed")
 
 

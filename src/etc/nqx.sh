@@ -1,6 +1,7 @@
-export NQX_ROOT="/mnt/beegfs/project/ndqm/shared_utilities/nqx"
-export NQX_EXE="$NQX_ROOT/bin/nqx"
-#export CONDA_PYTHON_EXE='/mnt/beegfs/softs/opt/core/mambaforge/22.11.1-4/bin/python'
+
+# Old
+# export NQX_ROOT="/mnt/beegfs/project/ndqm/shared_utilities/nqx"
+# export NQX_EXE="$NQX_ROOT/bin/nqx_exe"
 
 __nqx_exe() (
     "$NQX_EXE" "$@"
