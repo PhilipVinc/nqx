@@ -166,13 +166,11 @@ def install_packages(name, file, venv_depot, *, environment: EnvConfig):
         raise FileNotFoundError(f"Requirements file {file} does not exist")
 
     # set the env for uv
-    env = os.environ.copy()
-    env["VIRTUAL_ENV"] = str(venv_path)
     logging.debug("Installing packages in virtual environment VIRTUAL_ENV=%s , for file %s", venv_path, str(file))
     args = []
     if config["verbose"]:
         args.append("-v")
-    result = subprocess.run([UV_BIN, "pip", "install", *args, "-r", str(file)], env=env, capture_output=True, cwd=venv_path)
+    result = subprocess.run([UV_BIN, "pip", "install", *args, "-r", str(file)], env=environment.env, cwd=venv_path) # capture_output=True
     if result.returncode != 0:
         print("Installation failed because of an internal error of UV")
         print("==============================================")

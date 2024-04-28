@@ -32,7 +32,7 @@ __nqx_activate() {
 
 __nqx_reactivate() {
     \local ask_nqx
-    ask_nqx="$(PS1="${PS1:-}" __nqx_exe shell.posix reactivate)" || \return
+    ask_nqx="$(PS1="${PS1:-}" __nqx_exe reactivate)" || \return
     \eval "$ask_nqx"
     __nqx_hashr
 }
