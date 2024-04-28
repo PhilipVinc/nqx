@@ -36,11 +36,7 @@ oldest_requirements.txt
 # Logs and databases #
 ######################
 *.log
-*.sql
-*.sqlite
-*.json
-*.wf
-*.mpack
+
 
 # OS generated files #
 ######################

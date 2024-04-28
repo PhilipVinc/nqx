@@ -1,0 +1,25 @@
+{
+    "netket": {
+        "name": "netket",
+        "default_version": "master",
+        "github_repo": "netket/netket",
+    },
+    "mpi4py": {
+        "name": "mpi4py",
+        "default_version": "latest",
+    },
+    "mpi4jax": {
+        "name": "mpi4jax",
+        "default_version": "latest",
+        "github_repo": "mpi4jax/mpi4jax",
+    },
+    "jax": {
+        "name": "jax",
+        "github_repo": "google/jax",
+    },
+    "jax-gpu": {
+        "name": "jax",
+        "github_repo": "google/jax",
+        "index_url": "https://storage.googleapis.com/jax-releases/jax_releases.html",
+    },
+}

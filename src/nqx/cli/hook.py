@@ -3,6 +3,8 @@ from enum import Enum
 from pathlib import Path
 import os
 import sys
+import shutil
+import logging
 
 from rich import print
 import typer
@@ -23,8 +25,7 @@ def hook():
     with open(config_dir / "nqx.sh", "r") as f:
         bash_config = f.read()
 
-    binpath = os.path.join(sys.prefix, "bin")
-    nqx_exe = os.path.join(binpath, "nqx_exe")
+    nqx_exe = shutil.which("nqx")
     bash_config = f"export NQX_EXE='{nqx_exe}'\n" + bash_config
 
     print(bash_config)
@@ -61,9 +62,8 @@ def init(
     Install this tool in the shell.
     """
 
-    binpath = os.path.join(sys.prefix, "bin")
-    nqx_exe = os.path.join(binpath, "nqx")
-
+    nqx_exe = shutil.which("nqx")
+    logging.debug("Found nqx installation at path: %s", nqx_exe)
     setup_block = setup_block_template.format(nqx_exe)
 
     if not permanent:

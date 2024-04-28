@@ -1,0 +1,25 @@
+{
+    "name" : "default",
+    "type" : "local",
+    "internet" : true,
+    "python_provider" : "system",
+    "venv_provider" : "uv",
+    "venv_location" : "$HOME/.nqx/venv",
+    "configurations" : {
+        "cpu" : {
+            "requirements" : "projects/cpu.txt",
+            "modules" : [],
+            "env" : {
+                "NETKET_SAMPLE_ENV" : "1"
+            }
+        },
+        "gpu" : {
+            "requirements" : "projects/gpu.txt",
+            "modules" : []
+        },
+        "gpu-mpi" : {
+            "requirements" : "projects/gpu.txt",
+            "modules" : []
+        }
+    }
+}

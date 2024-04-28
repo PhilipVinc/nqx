@@ -1,0 +1,22 @@
+{
+    "name" : "cholesky",
+    "type" : "cluster",
+    "internet" : true,
+    "venv_provider" : "uv",
+    "venv_location" : "$WORKDIR/nqx/venv",
+    "package_manager" : "uv",
+    "configurations" : {
+        "cpu" : {
+            "requirements" : "projects/cpu.txt",
+            "modules" : ["gcc/10.2.0", "openmpi/4.1.4"]
+        },
+        "gpu" : {
+            "modules": [],
+            "requirements" : "projects/gpu.txt"
+        },
+        "gpu-mpi" : {
+            "modules": ["gcc/10.2.0", "openmpi/4.1.4", "cuda", "cudnn"],
+            "requirements" : "projects/gpu.txt"
+        }
+    }
+}
