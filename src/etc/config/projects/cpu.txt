@@ -1,0 +1,2 @@
+jax[cpu]
+netket[mpi] @ git+https://github.com/netket/netket
