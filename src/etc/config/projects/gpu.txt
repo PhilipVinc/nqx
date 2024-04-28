@@ -1,2 +1,4 @@
-jax[cuda12_pip] @ https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
+--find-links https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
+
+jax[cuda12_pip]
 git+https://github.com/netket/netket

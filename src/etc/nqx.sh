@@ -52,3 +52,14 @@ nqx() {
             ;;
     esac
 }
+
+if [ -z "${NQX_SHLVL+x}" ]; then
+    \export NQX_SHLVL=0
+
+    # We're not allowing PS1 to be unbound. It must at least be set.
+    # However, we're not exporting it, which can cause problems when starting a second shell
+    # via a first shell (i.e. starting zsh from bash).
+    if [ -z "${PS1+x}" ]; then
+        PS1=
+    fi
+fi

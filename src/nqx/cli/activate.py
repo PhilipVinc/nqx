@@ -56,19 +56,28 @@ def activate(
     ###############################################################
     #
     for k, v in env_config.env.items():
-        print(f"export {k}={v}")
-    print(f"export NQX_ENV={name}")
+        print(f"export {k}=\"{v}\"")
+    print(f"export NQX_ENV=\"{name}\"")
 
     ###############################################################
     # Setup modules
     modules_to_load = config["configurations"][type.value].get("modules", [])
+    logging.debug("Must load modules: %s", modules_to_load)
     if len(modules_to_load) > 0:
         logging.debug("Loading modules")
         #env_config = modules.load_modules(*modules_to_load, environment=env_config)
         cmd = "module load " + " ".join(modules_to_load)
+        print(cmd)
 
-
-
+    # PS1
+    ps1 = os.getenv("PS1", "")
+    if "POWERLINE_COMMAND" in ps1:
+        # defer
+        pass
+    else:
+        print(f"""export _NQX_PS1_BACKUP="$PS1" """)
+        print(f"""PS1="(nqx:{name}) $PS1" """)
+        
 @app.command()
 def deactivate():
     """
@@ -111,3 +120,12 @@ def deactivate():
         if len(modules_to_load) > 0:
             #env_config = modules.load_modules(*modules_to_load, environment=env_config)
             cmd = "module unload " + " ".join(modules_to_load)
+
+    # psi1
+    ps1 = os.getenv("PS1", "")
+    old_psi1 = os.getenv("_NQX_PS1_BACKUP", None)
+    if "POWERLINE_COMMAND" in ps1:
+        # defer
+        pass
+    elif old_psi1 is not None:
+        print(f"""PS1="$_NQX_PS1_BACKUP" """)

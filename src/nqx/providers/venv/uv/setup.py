@@ -173,10 +173,6 @@ def install_packages(name, file, venv_depot, *, environment: EnvConfig):
     result = subprocess.run([UV_BIN, "pip", "install", *args, "-r", str(file)], env=environment.env, cwd=venv_path) # capture_output=True
     if result.returncode != 0:
         print("Installation failed because of an internal error of UV")
-        print("==============================================")
-        print(result.stdout.decode("utf-8"))
-        print("==============================================")
-        print(result.stderr.decode("utf-8"))
-        print("==============================================")
-        raise RuntimeError(f"Failed to install packages in virtual environment {name}")
+        #raise RuntimeError(f"Failed to install packages in virtual environment {name}")
+        typer.Exit(1)
     return result
