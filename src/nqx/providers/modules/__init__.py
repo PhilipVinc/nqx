@@ -120,3 +120,48 @@ def execute_module_in_env(*modules_command: tuple[str, ...], environment: EnvCon
 
     # Return the environment dictionary after executing the command
     return EnvConfig(env=new_env)
+
+
+
+def generate_module_script(*modules_command: tuple[str, ...], environment: EnvConfig):
+    """
+    Executes a modules command in an environment.
+
+    This spawns a subpython shell.
+
+    This uses the `module ***` command to load the modules in the specified environment.
+    """
+    if len(modules_command) == 0:
+        return ""
+    
+    MODULESHOME = os.environ.get("MODULESHOME", None)
+    if MODULESHOME is None or not os.path.exists(MODULESHOME):
+        print(
+            "MODULESHOME is not set or does not exist. Please set MODULESHOME to the path of the modules directory."
+        )
+        typer.Exit(1)
+    
+    MODULESHOME = Path(MODULESHOME)
+
+    MODULES_INIT_FILE = None
+    for init_file in PYTHON_MODULEFILES_INIT:
+        if  (MODULESHOME / init_file).exists():
+            MODULES_INIT_FILE = MODULESHOME / init_file
+            break
+    if MODULES_INIT_FILE is None:
+        raise FileNotFoundError("Could not find the required module init file in the MODULESHOME directory.")
+
+
+    # Create a copy of the current environment variables dictionary
+    modules_command = ['"{}"'.format(module) for module in modules_command]
+
+    # Create a separate Python interpreter with the updated environment
+    script = []
+    script.append(f"import os")
+    script.append(f"_path = {str(MODULES_INIT_FILE)}")
+    script.append(f"with open(_path, 'r') as f:")
+    script.append(f"    exec(f.read())")
+    script.append(f"module('load', {', '.join(modules_command)})")
+    script.append("")
+
+    return "\n".join(script)

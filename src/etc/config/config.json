@@ -5,6 +5,9 @@
     "python_provider" : "system",
     "venv_provider" : "uv",
     "venv_location" : "$HOME/.nqx/venv",
+    "ipykernel" : {
+        "enable" : "true"
+    },
     "configurations" : {
         "cpu" : {
             "requirements" : "projects/cpu.txt",

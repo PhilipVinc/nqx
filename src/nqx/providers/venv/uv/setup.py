@@ -1,8 +1,10 @@
+from typing import Optional
 import os
 import subprocess
 import json
 import shutil
 import logging
+from pathlib import Path
 
 import typer
 
@@ -154,7 +156,7 @@ def get_env_type(name, venv_depot) -> EnvType:
     return EnvType(config.get('type', None))
 
 
-def install_packages(name, file, venv_depot, *, environment: EnvConfig):
+def install_packages(name, *packages, file : Optional[Path] = None, venv_depot :str, environment: EnvConfig):
     config = get_config()
     venv_depot = resolve_env_vars(venv_depot)
     venv_path = venv_depot / name
@@ -162,17 +164,37 @@ def install_packages(name, file, venv_depot, *, environment: EnvConfig):
     if not venv_path.exists():
         raise FileNotFoundError(f"Virtual environment {venv_path} does not exist")
 
-    if not os.path.exists(file):
-        raise FileNotFoundError(f"Requirements file {file} does not exist")
-
     # set the env for uv
-    logging.debug("Installing packages in virtual environment VIRTUAL_ENV=%s , for file %s", venv_path, str(file))
     args = []
     if config["verbose"]:
         args.append("-v")
-    result = subprocess.run([UV_BIN, "pip", "install", *args, "-r", str(file)], env=environment.env, cwd=venv_path) # capture_output=True
+
+    if file is not None:
+        args.append("-r")
+        args.append(str(file))
+    
+    for pkg in packages:
+        args.append(pkg)
+
+    logging.debug("Installing packages (%s) in virtual environment VIRTUAL_ENV=%s", args, venv_path)
+    result = subprocess.run([UV_BIN, "pip", "install", *args], env=environment.env, cwd=venv_path) # capture_output=True
     if result.returncode != 0:
         print("Installation failed because of an internal error of UV")
         #raise RuntimeError(f"Failed to install packages in virtual environment {name}")
         typer.Exit(1)
+    return result
+
+def run_python_command(name, command, *,venv_depot, environment: EnvConfig, capture_output=False):
+    venv_depot = resolve_env_vars(venv_depot)
+    venv_path = venv_depot / name
+
+    if not venv_path.exists():
+        raise FileNotFoundError(f"Virtual environment {venv_path} does not exist")
+
+    py_path = venv_path / "bin" / "python"
+    command = [str(py_path)] + command
+    logging.debug("Running command %s in virtual environment VIRTUAL_ENV=%s", command, venv_path)
+    result = subprocess.run(command, env=environment.env, cwd=venv_path, capture_output=capture_output)
+    if result.returncode != 0:
+        raise RuntimeError(f"Failed to run command in virtual environment {name}")
     return result

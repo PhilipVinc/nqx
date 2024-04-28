@@ -5,6 +5,7 @@ import shutil
 import os
 import logging
 import json
+import re
 
 from rich import print
 import typer
@@ -30,6 +31,9 @@ def create(
     skip_create: Annotated[
         bool, typer.Option(help="Skip the creation of the environment.")
     ] = False,
+    kernel: Annotated[
+        bool, typer.Option(help="Create the iPyKernel kernel for the environment."),
+    ] = True,
     provider: Annotated[
         VenvProviderType, typer.Option(help="The provider to use for the environment.")
     ] = VenvProviderType.auto,
@@ -88,12 +92,58 @@ def create(
     file_subpath = config["configurations"][type.value]["requirements"]
     requirements_file = get_requirements_file_for_type(file_subpath)
 
+    if not os.path.exists(requirements_file):
+        print(f"Requirements file {requirements_file} does not exist")
+        typer.Exit(1)
+
     # install packages using pip
     print("installing packages")
     provider.install_packages(
         name, file=requirements_file, venv_depot=venv_depot, environment=env_config
     )
     print("installed")
+
+    ###############################################################
+    # Create the iPyKernel kernel
+    if kernel:
+        print("Creating kernel")
+        provider.install_packages(
+            name, "ipykernel", venv_depot=venv_depot, environment=env_config
+        )
+        result = provider.run_python_command(
+            name,
+            ["-m", "ipykernel", 
+            "install", "--user", "--name", name, 
+            "--display-name", f"NQX:Python ({name})",
+            ],
+            venv_depot=venv_depot,
+            environment=env_config,
+            capture_output=True,
+        )
+
+        output = result.stdout.decode("utf-8").strip()
+
+        match = re.search(r'in (.*)', output)
+        if match:
+            base_path = match.group(1)
+            logging.debug("Kernel installed in %s", base_path)
+
+        base_path = Path(base_path)
+
+        script = modules.generate_module_script(*modules_to_load, environment=env_config)
+        with open (base_path / "startup.py", "w") as f:
+            f.write(script)
+
+        kernel_path = base_path/ "kernel.json"
+        with open(kernel_path, "r") as f:
+            kernel_config = json.load(f)
+        _env = kernel_config.get('env', {})
+        _env["PYTHONSTARTUP"] = str(base_path / "startup.py")
+        kernel_config["env"] = _env
+        with open(kernel_path, "w") as f:
+            json.dump(kernel_config, f)
+        print("edited kernel at ", kernel_path)
+
 
 
 @app.command(no_args_is_help=True)
