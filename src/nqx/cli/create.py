@@ -62,11 +62,11 @@ def create(
     venv_depot = config["venv_location"]
 
     if not skip_create:
-        print("Skipping environment creation")
         env_config = provider.create_env(
             name, type, venv_depot=venv_depot, force=force, environment=env_config
         )
     else:
+        print("Skipping environment creation")
         env_config = provider.activate_env(
             name, venv_depot=venv_depot, environment=env_config
         )

@@ -20,7 +20,14 @@ def is_installed():
 
 
 def install(verbose=False):
-    print("Installing uv")
+    print()
+    print("UV (A replacement for pip) is not installed. To work, NQX requires UV to be installed.")
+    do_continue = typer.confirm("Do you want to install it now ? (Answering no will abort)")
+    print()
+    if not do_continue:
+        print("Aborting installation of UV.")
+        raise typer.Exit(1)
+    
     result = subprocess.run(
         "curl -LsSf https://astral.sh/uv/install.sh | sh", shell=True
     )
