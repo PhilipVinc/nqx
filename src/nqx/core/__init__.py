@@ -24,5 +24,6 @@ ProviderType = VenvProviderType
 
 class PythonProviderType(str, Enum):
     system = "system"
+    modules = "modules"
     mamba = "mamba"
     auto = "auto"
