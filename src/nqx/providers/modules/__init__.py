@@ -109,7 +109,7 @@ def execute_module_in_env(*modules_command: tuple[str, ...], environment: EnvCon
 
     # Execute the user-provided command in the separate interpreter
     modules_command = [f'"{module}"' for module in modules_command]
-    command = ", ".join(modules_command) + "\n"
+    command = ", ".join(modules_command)
     command = f"module({command})\n"
     python_interpreter.stdin.write(command.encode())
     python_interpreter.stdin.flush()
