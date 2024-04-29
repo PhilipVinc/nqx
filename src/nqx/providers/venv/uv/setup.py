@@ -180,15 +180,15 @@ def write_env_config(name, config: dict, venv_depot):
     return config
 
 
-def set_env_type(name, type: EnvType, venv_depot):
+def set_env_config(name, venv_depot, key :str, value):
     config = read_env_config(name, venv_depot)
-    config["type"] = type.value
+    config[key] = value
     write_env_config(name, config, venv_depot)
 
 
-def get_env_type(name, venv_depot) -> EnvType:
+def get_env_config(name, venv_depot, key: str, default = None):
     config = read_env_config(name, venv_depot)
-    return EnvType(config.get("type", None))
+    return config.get(key, default)
 
 
 def install_packages(

@@ -25,7 +25,7 @@ def list():
     print("# Available NQX-friendly environments are:")
     print(f"# {'name':<20} \t {'type':<5} \t {'path'}")
     for name, path in envs:
-        type = provider.get_env_type(name, venv_depot).value
+        type = provider.get_env_config(name, venv_depot, "type")
         if type is None:
             type = "?"
 

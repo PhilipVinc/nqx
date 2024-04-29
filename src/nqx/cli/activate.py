@@ -5,7 +5,7 @@ import logging
 from rich import print
 import typer
 
-from nqx.core import EnvConfig, VenvProviderType
+from nqx.core import EnvConfig, VenvProviderType, EnvType
 from nqx.providers import get_venv_provider, get_python_provider
 
 from .config import get_config
@@ -47,7 +47,7 @@ def activate(
 
     ###############################################################
     # Setup env variables
-    type = provider.get_env_type(name, venv_depot)
+    type = EnvType(provider.get_env_config(name, venv_depot, "type"))
     env_config.update(config["configurations"][type.value].get("env", {}))
 
     ###############################################################
@@ -106,7 +106,7 @@ def deactivate():
     current_env = os.environ.get("NQX_ENV", None)
 
     if current_env is not None:
-        type = provider.get_env_type(current_env, venv_depot)
+        type = EnvType(provider.get_env_config(current_env, venv_depot, "type"))
         env_variables = config["configurations"][type.value].get("env", {})
         for k in env_variables.keys():
             print(f"unset {k}")

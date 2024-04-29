@@ -73,7 +73,7 @@ def create(
 
     ###############################################################
     # Write the nqx tag file to store the env type
-    provider.set_env_type(name, type, venv_depot)
+    provider.set_env_config(name, venv_depot, "type", type.value)
 
     ###############################################################
     # Setup env variables
@@ -143,13 +143,6 @@ def create(
         os.chmod(str(script_path), os.stat(str(script_path)).st_mode | 0o111)
 
 
-
-        # script = modules.generate_module_script(
-        #     *modules_to_load, environment=env_config
-        # )
-        # with open(base_path / "startup.py", "w") as f:
-        #     f.write(script)
-
         kernel_path = base_path / "kernel.json"
         with open(kernel_path) as f:
             kernel_config = json.load(f)
@@ -163,6 +156,9 @@ def create(
         with open(kernel_path, "w") as f:
             json.dump(kernel_config, f)
         print("edited kernel at ", kernel_path)
+
+        # Remember us where it is located
+        provider.set_env_config(name, venv_depot, "kernel_path", str(base_path))
 
 
 @app.command(no_args_is_help=True)
@@ -178,6 +174,10 @@ def remove(
 
     venv_depot = Path(config["venv_location"])
     provider = get_venv_provider(provider)
+
+    kernel_path = provider.get_env_config(name, venv_depot, "kernel_path", None)
+    if kernel_path is not None:
+        shutil.rmtree(kernel_path)
 
     provider.remove_env(name, venv_depot=venv_depot)
     print(f"Environment {name} removed")

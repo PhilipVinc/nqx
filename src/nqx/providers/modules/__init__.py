@@ -228,12 +228,11 @@ def generate_module_bash_script(*modules_command: tuple[str, ...], environment: 
         return ""
 
     # Create a copy of the current environment variables dictionary
-    modules_command = ["module"] + list(modules_command)
+    modules_command = ["module", "load", ] + list(modules_command)
 
     # Create a separate Python interpreter with the updated environment
     script = ["#!/bin/bash"]
     script.append(" ".join(modules_command))
-    script.append(f"module('load', {', '.join(modules_command)})")
     script.append("\"$@\"")
     script.append("")
 
