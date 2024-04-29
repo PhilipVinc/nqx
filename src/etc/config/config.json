@@ -24,5 +24,8 @@
             "requirements" : "projects/gpu.txt",
             "modules" : []
         }
+    }, 
+    "env" : {
+        "NQX_HOME" : "$HOME/.nqx"
     }
 }

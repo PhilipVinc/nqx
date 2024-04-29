@@ -17,6 +17,21 @@ PYTHON_MODULEFILES_INIT = [
 ]
 
 
+def is_available():
+    """
+    Check if the `module` command is available in the shell.
+    """
+    MODULESHOME = os.environ.get("MODULESHOME", None)
+    if MODULESHOME is None or not os.path.exists(MODULESHOME):
+        return False
+    MODULESHOME = Path(MODULESHOME)
+
+    for init_file in PYTHON_MODULEFILES_INIT:
+        if (MODULESHOME / init_file).exists():
+            return True
+    return False
+
+
 def load_modules(*module_names: str, environment: EnvConfig):
     """
     Load one or more modules in the specified environment.
@@ -24,6 +39,9 @@ def load_modules(*module_names: str, environment: EnvConfig):
     This uses the `module load` command to load the modules in the specified environment.
     """
     return execute_module_in_env("load", *module_names, environment=environment)
+
+
+load = load_modules
 
 
 def execute_module_in_env(*modules_command: tuple[str, ...], environment: EnvConfig):
@@ -42,15 +60,17 @@ def execute_module_in_env(*modules_command: tuple[str, ...], environment: EnvCon
         )
         typer.Exit(1)
         raise FileNotFoundError("MODULESHOME is not set or does not exist.")
-    
+
     MODULESHOME = Path(MODULESHOME)
     logging.debug("MODULESHOME: %s", MODULESHOME)
 
-    logging.debug("Scanning for the required module init file in the MODULESHOME directory.")
+    logging.debug(
+        "Scanning for the required module init file in the MODULESHOME directory."
+    )
     MODULES_INIT_FILE = None
     for init_file in PYTHON_MODULEFILES_INIT:
         logging.debug("Checking for the file: %s", str(MODULESHOME / init_file))
-        if  (MODULESHOME / init_file).exists():
+        if (MODULESHOME / init_file).exists():
             logging.debug(
                 f"Found the required file {init_file} in the MODULESHOME directory."
             )
@@ -63,8 +83,9 @@ def execute_module_in_env(*modules_command: tuple[str, ...], environment: EnvCon
         print("I checked the following paths:")
         for init_file in PYTHON_MODULEFILES_INIT:
             print(MODULESHOME / init_file)
-        raise FileNotFoundError("Could not find the required module init file in the MODULESHOME directory.")
-
+        raise FileNotFoundError(
+            "Could not find the required module init file in the MODULESHOME directory."
+        )
 
     # Create a copy of the current environment variables dictionary
     env = environment.env
@@ -80,14 +101,14 @@ def execute_module_in_env(*modules_command: tuple[str, ...], environment: EnvCon
     logging.debug("Started subshell using the python interpreter %s", sys.executable)
 
     # Execute the command '$MODULESHOME/init/python.py' in the separate interpreter
-    #init_command = str(MODULESHOME / "init/python.py") + "\n"
-    #python_interpreter.stdin.write(init_command.encode())
-    #python_interpreter.stdin.flush()
-    #output = python_interpreter.stdout.readline().decode()
-    #logging.debug("Output of modules init command: %s", output.strip())
+    # init_command = str(MODULESHOME / "init/python.py") + "\n"
+    # python_interpreter.stdin.write(init_command.encode())
+    # python_interpreter.stdin.flush()
+    # output = python_interpreter.stdout.readline().decode()
+    # logging.debug("Output of modules init command: %s", output.strip())
 
     # Execute the user-provided command in the separate interpreter
-    modules_command = ['"{}"'.format(module) for module in modules_command]
+    modules_command = [f'"{module}"' for module in modules_command]
     command = ", ".join(modules_command) + "\n"
     command = f"module({command})\n"
     python_interpreter.stdin.write(command.encode())
@@ -122,7 +143,6 @@ def execute_module_in_env(*modules_command: tuple[str, ...], environment: EnvCon
     return EnvConfig(env=new_env)
 
 
-
 def generate_module_script(*modules_command: tuple[str, ...], environment: EnvConfig):
     """
     Executes a modules command in an environment.
@@ -133,34 +153,35 @@ def generate_module_script(*modules_command: tuple[str, ...], environment: EnvCo
     """
     if len(modules_command) == 0:
         return ""
-    
+
     MODULESHOME = os.environ.get("MODULESHOME", None)
     if MODULESHOME is None or not os.path.exists(MODULESHOME):
         print(
             "MODULESHOME is not set or does not exist. Please set MODULESHOME to the path of the modules directory."
         )
         typer.Exit(1)
-    
+
     MODULESHOME = Path(MODULESHOME)
 
     MODULES_INIT_FILE = None
     for init_file in PYTHON_MODULEFILES_INIT:
-        if  (MODULESHOME / init_file).exists():
+        if (MODULESHOME / init_file).exists():
             MODULES_INIT_FILE = MODULESHOME / init_file
             break
     if MODULES_INIT_FILE is None:
-        raise FileNotFoundError("Could not find the required module init file in the MODULESHOME directory.")
-
+        raise FileNotFoundError(
+            "Could not find the required module init file in the MODULESHOME directory."
+        )
 
     # Create a copy of the current environment variables dictionary
-    modules_command = ['"{}"'.format(module) for module in modules_command]
+    modules_command = [f'"{module}"' for module in modules_command]
 
     # Create a separate Python interpreter with the updated environment
     script = []
-    script.append(f"import os")
+    script.append("import os")
     script.append(f"_path = {str(MODULES_INIT_FILE)}")
-    script.append(f"with open(_path, 'r') as f:")
-    script.append(f"    exec(f.read())")
+    script.append("with open(_path, 'r') as f:")
+    script.append("    exec(f.read())")
     script.append(f"module('load', {', '.join(modules_command)})")
     script.append("")
 

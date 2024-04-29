@@ -1,6 +1,5 @@
 import json
 import os
-import sys
 import socket
 
 from pathlib import Path
@@ -12,6 +11,7 @@ HOSTNAME = None
 
 
 def get_root():
+    raise NotImplementedError("This function is not implemented yet.")
     root = os.environ.get("NQX_ROOT", None)
     if root is None:
         root = "/Users/filippo.vicentini/Dropbox/Ricerca/Codes/Python/nqx/nqx/src"
@@ -26,7 +26,7 @@ def get_settings():
 
     # Load settings from the settings file
     settings_path = resolve_env_vars(get_root() / "etc/config/clusters.json")
-    with open(settings_path, "r") as f:
+    with open(settings_path) as f:
         DATA = json.load(f)
 
     # Resolve environment variables in the settings

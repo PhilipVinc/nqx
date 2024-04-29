@@ -3,7 +3,8 @@ from typing import Optional
 from nqx.core import VenvProviderType
 from nqx.cli.config import get_config
 
-def get_provider(provider : Optional[VenvProviderType] = None):
+
+def get_provider(provider: Optional[VenvProviderType] = None):
     if provider is None:
         config = get_config()
         provider = VenvProviderType(config["venv_provider"])

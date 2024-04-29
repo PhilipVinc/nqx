@@ -1,17 +1,13 @@
 from typing import Annotated
-from enum import Enum
 from pathlib import Path
 import os
-import sys
 import shutil
 import logging
 
 from rich import print
 import typer
 
-from nqx.providers import get_venv_provider
 
-from .config import get_config
 from .app import app
 
 
@@ -22,7 +18,7 @@ def hook():
     """
     config_dir = Path(os.environ["NQX_INTERNAL_CONFIG"])
 
-    with open(config_dir / "nqx.sh", "r") as f:
+    with open(config_dir / "nqx.sh") as f:
         bash_config = f.read()
 
     nqx_exe = shutil.which("nqx")
@@ -54,7 +50,7 @@ def init(
     permanent: Annotated[
         bool,
         typer.Option(
-            help="Add the initialization block to the shell profile.", 
+            help="Add the initialization block to the shell profile.",
         ),
     ] = False,
 ):
@@ -72,12 +68,12 @@ def init(
             "You must execute the following piece of code in your shell to activate nqx:"
         )
         print()
-        nqx_exe = nqx_exe.replace(" ", "\ ")
-        print('eval "$({} hook)"'.format(nqx_exe))
+        nqx_exe = nqx_exe.replace(" ", r"\ ")
+        print(f'eval "$({nqx_exe} hook)"')
         print()
     else:
         bashrc = Path.home() / ".bashrc"
-        with open(bashrc, "r") as f:
+        with open(bashrc) as f:
             bashrc_content = f.read()
 
         MAGIC_STRING = "# !! Contents within this block are managed by 'nqx init' !!"

@@ -1,7 +1,4 @@
 
-# Old
-# export NQX_ROOT="/mnt/beegfs/project/ndqm/shared_utilities/nqx"
-# export NQX_EXE="$NQX_ROOT/bin/nqx_exe"
 
 __nqx_exe() (
     "$NQX_EXE" "$@"

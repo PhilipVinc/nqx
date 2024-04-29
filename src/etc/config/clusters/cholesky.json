@@ -18,5 +18,8 @@
             "modules": ["gcc/10.2.0", "openmpi/4.1.4", "cuda", "cudnn"],
             "requirements" : "projects/gpu.txt"
         }
+    }, 
+    "env" : {
+        "NQX_HOME" : "$WORKDIR/.nqx"
     }
 }

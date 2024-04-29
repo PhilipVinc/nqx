@@ -1,18 +1,16 @@
-from packaging.version import Version, parse
+import subprocess
+
+import typer
 
 from nqx.core import EnvConfig
-
-
-import subprocess
 
 
 def _is_command_available(command):
     try:
         subprocess.run(
             [command, "--version"],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
             check=True,
+            capture_output=True,
         )
         return True
     except subprocess.CalledProcessError:

@@ -1,5 +1,3 @@
-from typing import Annotated
-from enum import Enum
 import logging
 
 import typer
@@ -10,12 +8,11 @@ import os
 from pathlib import Path
 
 from nqx.utils import resolve_env_vars
-from nqx.settings import get_settings, get_root, get_cluster_settings
 
 SEARCH_PATHS = [
-    "$NQX_ROOT/config/",
-    "/etc/config/nqx/",
-    "$NQX_INTERNAL_CONFIG/config/",
+    "$NQX_HOME",
+    "/etc/config/nqx",
+    "$NQX_INTERNAL_CONFIG/config",
 ]
 
 _config = None
@@ -26,6 +23,17 @@ class ConfigDict(dict):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+    def set_env(self, key, value):
+        if "env" not in self:
+            self["env"] = {}
+
+        self["env"][key] = value
+
+    def get_env(self, key, default=None):
+        if "env" not in self:
+            return default
+        return self["env"].get(key, default)
 
 
 def get_config():
@@ -45,7 +53,7 @@ def _load_config():
     logging.debug("Searching in %s", SEARCH_PATHS)
 
     for path in reversed(SEARCH_PATHS):
-        path = resolve_env_vars(path)
+        path = resolve_env_vars(path, config.get("env", {}))
         logging.debug("Inspecting %s", path)
 
         # load main config file
@@ -70,7 +78,7 @@ def maybe_load_config_file(path, config):
     if not path.exists():
         return
     try:
-        with open(path, "r") as f:
+        with open(path) as f:
             data = json.load(f)
     except json.JSONDecodeError:
         print(f"Invalid configuration file {path} (not valid Json).")
@@ -82,8 +90,10 @@ def maybe_load_config_file(path, config):
 
 
 def get_requirements_file_for_type(requirement_file_name: Path) -> Path:
+    config = get_config()
+
     for path in SEARCH_PATHS:
-        path = resolve_env_vars(path)
+        path = resolve_env_vars(path, config.get("env", {}))
         path = path / requirement_file_name
         if path.exists():
             return path

@@ -1,11 +1,5 @@
-from typing import Annotated
-from enum import Enum
-from pathlib import Path
-
 from rich import print
-import typer
 
-from nqx.core import EnvType, ProviderType
 from nqx.providers import get_venv_provider
 
 from .config import get_config

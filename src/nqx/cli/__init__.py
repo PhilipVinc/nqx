@@ -5,6 +5,7 @@ from . import create
 from . import list
 from . import activate
 from . import hook
+from . import setup
 
 
 def main():

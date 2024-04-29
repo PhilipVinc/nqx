@@ -1,5 +1,4 @@
 from typing import Annotated
-from enum import Enum
 from pathlib import Path
 import shutil
 import os
@@ -10,7 +9,7 @@ import re
 from rich import print
 import typer
 
-from nqx.core import EnvConfig, EnvType, VenvProviderType, PythonProviderType
+from nqx.core import EnvConfig, EnvType, VenvProviderType
 from nqx.providers import get_venv_provider, get_python_provider, modules
 
 from .config import get_config, get_requirements_file_for_type
@@ -32,7 +31,8 @@ def create(
         bool, typer.Option(help="Skip the creation of the environment.")
     ] = False,
     kernel: Annotated[
-        bool, typer.Option(help="Create the iPyKernel kernel for the environment."),
+        bool,
+        typer.Option(help="Create the iPyKernel kernel for the environment."),
     ] = True,
     provider: Annotated[
         VenvProviderType, typer.Option(help="The provider to use for the environment.")
@@ -112,9 +112,15 @@ def create(
         )
         result = provider.run_python_command(
             name,
-            ["-m", "ipykernel", 
-            "install", "--user", "--name", name, 
-            "--display-name", f"NQX:Python ({name})",
+            [
+                "-m",
+                "ipykernel",
+                "install",
+                "--user",
+                "--name",
+                name,
+                "--display-name",
+                f"NQX:Python ({name})",
             ],
             venv_depot=venv_depot,
             environment=env_config,
@@ -123,27 +129,28 @@ def create(
 
         output = result.stdout.decode("utf-8").strip()
 
-        match = re.search(r'in (.*)', output)
+        match = re.search(r"in (.*)", output)
         if match:
             base_path = match.group(1)
             logging.debug("Kernel installed in %s", base_path)
 
         base_path = Path(base_path)
 
-        script = modules.generate_module_script(*modules_to_load, environment=env_config)
-        with open (base_path / "startup.py", "w") as f:
+        script = modules.generate_module_script(
+            *modules_to_load, environment=env_config
+        )
+        with open(base_path / "startup.py", "w") as f:
             f.write(script)
 
-        kernel_path = base_path/ "kernel.json"
-        with open(kernel_path, "r") as f:
+        kernel_path = base_path / "kernel.json"
+        with open(kernel_path) as f:
             kernel_config = json.load(f)
-        _env = kernel_config.get('env', {})
+        _env = kernel_config.get("env", {})
         _env["PYTHONSTARTUP"] = str(base_path / "startup.py")
         kernel_config["env"] = _env
         with open(kernel_path, "w") as f:
             json.dump(kernel_config, f)
         print("edited kernel at ", kernel_path)
-
 
 
 @app.command(no_args_is_help=True)

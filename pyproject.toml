@@ -28,6 +28,7 @@ dependencies = [
   "rich>=11.2.0",
   "typer>=0.4.0",
   "pygments>=2.10.0",
+  "packaging",
 ]
 
 [project.urls]
@@ -93,4 +94,22 @@ exclude_lines = [
   "no cov",
   "if __name__ == .__main__.:",
   "if TYPE_CHECKING:",
+]
+
+[tool.ruff]
+target-version = "py39"
+line-length = 88
+exclude = [".git"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "D410", "UP"]
+fixable = ["E", "F", "W", "D", "UP"]
+ignore = ["E501", "E731", "E741", "F401"]
+
+[tool.hatch.envs.upkeep]
+detached = true
+installer = "uv"
+dependencies = [
+  "httpx",
+  "ruff",
 ]
