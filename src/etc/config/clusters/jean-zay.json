@@ -9,14 +9,14 @@
     "configurations" : {
         "cpu" : {
             "requirements" : "projects/cpu.txt",
-            "modules" : ["gcc/10.2.0", "openmpi/4.1.4"]
+            "modules" : ["openmpi/4.1.5"]
         },
         "gpu" : {
             "modules": [],
             "requirements" : "projects/gpu.txt"
         },
         "gpu-mpi" : {
-            "modules": ["gcc/10.2.0", "openmpi/4.1.4", "cuda", "cudnn"],
+            "modules": ["openmpi/4.1.5-cuda", "cudnn"],
             "requirements" : "projects/gpu.txt"
         }
     }, 

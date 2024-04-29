@@ -136,18 +136,30 @@ def create(
 
         base_path = Path(base_path)
 
-        script = modules.generate_module_script(
-            *modules_to_load, environment=env_config
-        )
-        with open(base_path / "startup.py", "w") as f:
-            f.write(script)
+        script_path = base_path / "launch_kernel"
+        with open(script_path, "w") as f:
+            f.write(modules.generate_module_bash_script(*modules_to_load, environment=env_config))
+        
+        os.chmod(str(script_path), os.stat(str(script_path)).st_mode | 0o111)
+
+
+
+        # script = modules.generate_module_script(
+        #     *modules_to_load, environment=env_config
+        # )
+        # with open(base_path / "startup.py", "w") as f:
+        #     f.write(script)
 
         kernel_path = base_path / "kernel.json"
         with open(kernel_path) as f:
             kernel_config = json.load(f)
         _env = kernel_config.get("env", {})
-        _env["PYTHONSTARTUP"] = str(base_path / "startup.py")
+        #_env["PYTHONSTARTUP"] = str(base_path / "startup.py")
+        _env["MODULESHOME"] = os.environ.get("MODULESHOME", "")
+        _env["MODULEPATH"] = os.environ.get("MODULEPATH", "")
         kernel_config["env"] = _env
+
+        kernel_config["argv"] = [str(script_path)] + kernel_config["argv"]
         with open(kernel_path, "w") as f:
             json.dump(kernel_config, f)
         print("edited kernel at ", kernel_path)
