@@ -2,7 +2,6 @@
     "name" : "cholesky",
     "type" : "cluster",
     "internet" : true,
-    "python_provider" : "modules",
     "venv_provider" : "uv",
     "venv_location" : "$WORKDIR/nqx/venv",
     "package_manager" : "uv",
